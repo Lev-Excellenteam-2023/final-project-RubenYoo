@@ -27,3 +27,14 @@ class PowerpointParser:
                 yield slide_text
 
 
+def main():
+    path = input("Enter your powerpoint file path\n")
+
+    pptx_object = PowerpointParser(path)
+
+    for slide, text in enumerate(pptx_object.extract_text_from_slide()):
+        print(f"slide {slide}\n{text}")
+
+
+if __name__ == "__main__":
+    main()
