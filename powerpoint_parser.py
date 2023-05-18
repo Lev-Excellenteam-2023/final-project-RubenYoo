@@ -22,9 +22,10 @@ class PowerpointParser:
                     if shape.has_text_frame:
                         for paragraph in shape.text_frame.paragraphs:
                             for run in paragraph.runs:
-                                slide_text += '\n' + run.text
+                                slide_text += '\n' + run.text.strip()
 
-                yield slide_text
+                if slide_text != "":
+                    yield slide_text
 
 
 def main():
