@@ -22,7 +22,7 @@ class PowerpointParser:
                     if shape.has_text_frame:
                         for paragraph in shape.text_frame.paragraphs:
                             for run in paragraph.runs:
-                                slide_text += run.text
+                                slide_text += '\n' + run.text
 
                 yield slide_text
 
@@ -33,7 +33,7 @@ def main():
     pptx_object = PowerpointParser(path)
 
     for slide, text in enumerate(pptx_object.extract_text_from_slide()):
-        print(f"slide {slide}\n{text}")
+        print(f"[slide {slide}]{text}")
 
 
 if __name__ == "__main__":
