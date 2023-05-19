@@ -62,4 +62,9 @@ class GptExplainer:
         else:
             self.explanations_slides += [(slide_number, "")]
 
-
+    def get_explanations_slides(self) -> list:
+        """
+        This method returns the explanations_slides list
+        :return: the explanations_slides list
+        """
+        return self.explanations_slides
