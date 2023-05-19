@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 import openai
+import asyncio
 
 # Load the environment variables
 load_dotenv()
@@ -35,7 +36,7 @@ class GptExplainer:
         # Saving the explanations of the slides
         self.explanations_slides = []
 
-    def send_slide_text_to_gpt(self, slide_number: int, text_of_slide: str) -> None:
+    async def send_slide_text_to_gpt(self, slide_number: int, text_of_slide: str) -> None:
         """
         This method sends the text of a slide to the gpt-3.5-turbo model and saves the response in the
         explanations_slides list.
@@ -48,11 +49,11 @@ class GptExplainer:
         self.gpt_context.append({"role": "user", "content": text_of_slide})
 
         # Generate a response from the model
-        response = openai.ChatCompletion.create(
+        response = await asyncio.to_thread(openai.ChatCompletion.create(
             model=self.model,
             messages=self.gpt_context,
             timeout=TIMEOUT
-        )
+        ))
 
         # If the response is not empty, save it in the explanations_slides list
         # and append it to the gpt_context for more context for the other slides
