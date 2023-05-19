@@ -39,8 +39,8 @@ class GptExplainer:
         """
         This method sends the text of a slide to the gpt-3.5-turbo model and saves the response in the
         explanations_slides list.
-        :param slide_number:
-        :param text_of_slide:
+        :param slide_number: the number of the slide
+        :param text_of_slide: the text of the slide
         :return: None
         """
 
