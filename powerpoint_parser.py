@@ -44,10 +44,13 @@ class PowerpointParser:
 
 
 def main():
+    # Get the path to the PowerPoint file
     path = input("Enter your powerpoint file path\n")
 
+    # Create a PowerpointParser object
     pptx_object = PowerpointParser(path)
 
+    # Iterate through each slide and print the results
     for slide, text in enumerate(pptx_object.extract_text_from_slide()):
         print(f"[slide {slide}]{text}")
 
