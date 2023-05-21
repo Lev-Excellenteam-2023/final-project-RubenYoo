@@ -1,5 +1,6 @@
 import powerpoint_parser
 import gpt_explainer
+import gather_explanations_to_json
 import asyncio
 
 
@@ -22,8 +23,8 @@ async def main():
     # explain each slide
     await asyncio.gather(*coroutines)
 
-    # Print the results
-    print(gpt_object.get_explanations_slides())
+    # Save the results into a json file
+    gather_explanations_to_json.save_to_json(gpt_object.get_explanations_slides(), path)
 
 
 if __name__ == '__main__':
