@@ -15,6 +15,7 @@ class GptExplainer:
     """
     This class is used to explain the slides of a PowerPoint presentation based on the gpt-3.5-turbo model.
     """
+
     def __init__(self) -> None:
         """
         Initialize the class
@@ -29,8 +30,8 @@ class GptExplainer:
         self.gpt_context = [
             {"role": "system",
              "content":
-             "You are a lecturer, that take in input the text of a powerpoint presentation slide, and you need "
-             "to explain it"},
+                 "You are a lecturer, that take in input the text of a powerpoint presentation slide, and you need "
+                 "to explain it"},
         ]
 
         # Saving the explanations of the slides
@@ -45,19 +46,24 @@ class GptExplainer:
         :return: None
         """
 
+        print(f"Slide {slide_number} processing...")
+
         # Setting the slide text as the user input
         self.gpt_context.append({"role": "user", "content": text_of_slide})
 
         # Generate a response from the model
         response = await asyncio.to_thread(openai.ChatCompletion.create,
-            model=self.model,
-            messages=self.gpt_context,
-            timeout=TIMEOUT)
+                                           model=self.model,
+                                           messages=self.gpt_context,
+                                           timeout=TIMEOUT
+                                           )
+
+        print(f"Slide {slide_number} processed!")
 
         # If the response is not empty, save it in the explanations_slides list
         # and append it to the gpt_context for more context for the other slides
         if 'choices' in response and len(response.choices) > 0:
-            # self.gpt_context.append({"role": "assistant", "content": response})
+            self.gpt_context.append({"role": "assistant", "content": response})
             self.explanations_slides += [(slide_number, response.choices[0].message.content.strip())]
         else:
             self.explanations_slides += [(slide_number, "")]
@@ -71,14 +77,14 @@ class GptExplainer:
 
 
 async def main():
-
     # Initialize the class
     gpt_explainer = GptExplainer()
 
     # Send the text of the slides to the gpt-3.5-turbo model
-    await gpt_explainer.send_slide_text_to_gpt(1, "Asyncio")
-    await gpt_explainer.send_slide_text_to_gpt(2, "Concurrency")
-    await gpt_explainer.send_slide_text_to_gpt(3, "Multiprocessing")
+    await asyncio.gather(gpt_explainer.send_slide_text_to_gpt(1, "Asyncio"),
+                         gpt_explainer.send_slide_text_to_gpt(2, "Concurrency"),
+                         gpt_explainer.send_slide_text_to_gpt(3, "Multiprocessing"))
+
 
     # Print the explanations of the slides
     print(gpt_explainer.get_explanations_slides())
