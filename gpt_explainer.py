@@ -59,9 +59,9 @@ class GptExplainer:
                                                messages=self.gpt_context,
                                                timeout=TIMEOUT
                                                )
-        except openai.error.Timeout | openai.error.APIError | openai.error.APIConnectionError\
-                | openai.error.InvalidRequestError | openai.error.AuthenticationError \
-                | openai.error.PermissionError | openai.error.RateLimitError as e:
+        except (openai.error.Timeout, openai.error.APIError, openai.error.APIConnectionError,
+                openai.error.InvalidRequestError, openai.error.AuthenticationError,
+                openai.error.PermissionError, openai.error.RateLimitError) as e:
             print(f"Slide: {slide_number} was not processed because of the following error: {e}")
             return
 
