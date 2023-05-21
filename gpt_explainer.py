@@ -63,7 +63,7 @@ class GptExplainer:
                 | openai.error.InvalidRequestError | openai.error.AuthenticationError \
                 | openai.error.PermissionError | openai.error.RateLimitError as e:
             print(f"Slide: {slide_number} was not processed because of the following error: {e}")
-            exit()
+            return
 
         print(f"Slide {slide_number} processed!")
 
