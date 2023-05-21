@@ -5,7 +5,7 @@ import os
 
 class PowerpointParser:
     """
-    This class is used to parse a powerpoint file and extract the text from each slide
+    This class is used to parse a PowerPoint file and extract the text from each slide
     """
     pptx_file: str
 
@@ -35,11 +35,11 @@ class PowerpointParser:
                 slide_text = ""
                 for shape in slide.shapes:
                     if shape.has_text_frame:
-                        for paragraph in shape.text_frame.paragraphs:
-                            for run in paragraph.runs:
-                                slide_text += '\n' + run.text.strip()
+                        text_frames = shape.text_frame
+                        slide_text += '\n'.join(
+                            [run.text.strip() for paragraph in text_frames.paragraphs for run in paragraph.runs])
 
-                if slide_text != "":
+                if slide_text:
                     yield slide_text
 
 
