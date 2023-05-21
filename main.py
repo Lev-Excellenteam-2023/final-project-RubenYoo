@@ -7,15 +7,20 @@ async def main():
     # Get the path to the PowerPoint file
     path = input("Enter your powerpoint file path\n")
 
-    # Create a PowerpointParser object
-    pptx_object = powerpoint_parser.PowerpointParser(path)
+    try:
+        pptx_object = powerpoint_parser.PowerpointParser(path)
+    except FileNotFoundError as e:
+        print(e)
+        exit()
 
-    # Create a GPTExplainer object
     gpt_object = gpt_explainer.GptExplainer()
 
-    # Iterate through each slide and send the slide text to the GPTExplainer object
-    for slide, text in enumerate(pptx_object.extract_text_from_slide()):
-        await gpt_object.send_slide_text_to_gpt(slide, text)
+    # Iterate through each slide and extract the slide text
+    coroutines = [gpt_object.send_slide_text_to_gpt(slide_number, slide_text) for slide_number, slide_text in
+                  enumerate(pptx_object.extract_text_from_slide())]
+
+    # explain each slide
+    await asyncio.gather(*coroutines)
 
     # Print the results
     print(gpt_object.get_explanations_slides())
