@@ -61,8 +61,8 @@ class GptExplainer:
                                                )
         except (openai.error.Timeout, openai.error.APIError, openai.error.APIConnectionError,
                 openai.error.InvalidRequestError, openai.error.AuthenticationError,
-                openai.error.PermissionError, openai.error.RateLimitError) as e:
-            print(f"Slide: {slide_number} was not processed because of the following error: {e}")
+                openai.error.PermissionError, openai.error.RateLimitError) as error:
+            print(f"Slide: {slide_number} was not processed because of the following error: {error}")
             return
 
         print(f"Slide {slide_number} processed!")

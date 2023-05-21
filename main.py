@@ -10,8 +10,8 @@ async def main():
 
     try:
         pptx_object = powerpoint_parser.PowerpointParser(path)
-    except FileNotFoundError as e:
-        print(e)
+    except FileNotFoundError as error:
+        print(error)
         exit()
 
     gpt_object = gpt_explainer.GptExplainer()
