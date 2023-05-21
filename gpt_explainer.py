@@ -61,9 +61,7 @@ class GptExplainer:
         print(f"Slide {slide_number} processed!")
 
         # If the response is not empty, save it in the explanations_slides list
-        # and append it to the gpt_context for more context for the other slides
         if 'choices' in response and len(response.choices) > 0:
-            self.gpt_context.append({"role": "assistant", "content": response})
             self.explanations_slides += [(slide_number, response.choices[0].message.content.strip())]
         else:
             self.explanations_slides += [(slide_number, "")]
