@@ -79,20 +79,3 @@ class GptExplainer:
         :return: the explanations_slides list
         """
         return self.explanations_slides
-
-
-async def main():
-    # Initialize the class
-    gpt_explainer = GptExplainer()
-
-    # Send the text of the slides to the gpt-3.5-turbo model
-    await asyncio.gather(gpt_explainer.send_slide_text_to_gpt(1, "Asyncio"),
-                         gpt_explainer.send_slide_text_to_gpt(2, "Concurrency"),
-                         gpt_explainer.send_slide_text_to_gpt(3, "Multiprocessing"))
-
-    # Print the explanations of the slides
-    print(gpt_explainer.get_explanations_slides())
-
-
-if __name__ == '__main__':
-    asyncio.run(main())
