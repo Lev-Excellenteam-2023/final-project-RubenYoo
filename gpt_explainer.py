@@ -52,11 +52,18 @@ class GptExplainer:
         self.gpt_context.append({"role": "user", "content": text_of_slide})
 
         # Generate a response from the model
-        response = await asyncio.to_thread(openai.ChatCompletion.create,
-                                           model=self.model,
-                                           messages=self.gpt_context,
-                                           timeout=TIMEOUT
-                                           )
+
+        try:
+            response = await asyncio.to_thread(openai.ChatCompletion.create,
+                                               model=self.model,
+                                               messages=self.gpt_context,
+                                               timeout=TIMEOUT
+                                               )
+        except openai.error.Timeout | openai.error.APIError | openai.error.APIConnectionError\
+                | openai.error.InvalidRequestError | openai.error.AuthenticationError \
+                | openai.error.PermissionError | openai.error.RateLimitError as e:
+            print(f"Slide: {slide_number} was not processed because of the following error: {e}")
+            exit()
 
         print(f"Slide {slide_number} processed!")
 
