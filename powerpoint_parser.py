@@ -45,7 +45,7 @@ class PowerpointParser:
 
 def main():
     # Get the path to the PowerPoint file
-    path = input("Enter your powerpoint file path\n")
+    path = input("Enter your PowerPoint file path\n")
 
     # Create a PowerpointParser object
     pptx_object = PowerpointParser(path)
