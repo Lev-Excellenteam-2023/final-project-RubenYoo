@@ -16,13 +16,14 @@ class GptExplainer:
     This class is used to explain the slides of a PowerPoint presentation based on the gpt-3.5-turbo model.
     """
 
+    model: str
+    gpt_context: list
+    explanations_slides: list
+
     def __init__(self) -> None:
         """
         Initialize the class
         """
-        self.model: str
-        self.gpt_context: list
-        self.explanations_slides: list
 
         # Setting the context of the gpt-3.5-turbo model
         openai.api_key = TOKEN
