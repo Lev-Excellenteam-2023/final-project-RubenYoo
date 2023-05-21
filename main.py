@@ -1,16 +1,22 @@
 import powerpoint_parser
 import gpt_explainer
+import gather_explanations_to_json
 import asyncio
+import argparse
 
 
 async def main():
-    # Get the path to the PowerPoint file
-    path = input("Enter your powerpoint file path\n")
+
+    # Parse the command line arguments
+    parser = argparse.ArgumentParser(description="Process slides and generate explanations for each slide.")
+    parser.add_argument("input", help="Path to the input PowerPoint file")
+    args = parser.parse_args()
+    file_path = args.input
 
     try:
-        pptx_object = powerpoint_parser.PowerpointParser(path)
-    except FileNotFoundError as e:
-        print(e)
+        pptx_object = powerpoint_parser.PowerpointParser(file_path)
+    except FileNotFoundError as error:
+        print(error)
         exit()
 
     gpt_object = gpt_explainer.GptExplainer()
@@ -22,8 +28,8 @@ async def main():
     # explain each slide
     await asyncio.gather(*coroutines)
 
-    # Print the results
-    print(gpt_object.get_explanations_slides())
+    # Save the results into a json file
+    gather_explanations_to_json.save_to_json(gpt_object.get_explanations_slides(), file_path)
 
 
 if __name__ == '__main__':

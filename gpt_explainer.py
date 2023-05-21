@@ -52,11 +52,18 @@ class GptExplainer:
         self.gpt_context.append({"role": "user", "content": text_of_slide})
 
         # Generate a response from the model
-        response = await asyncio.to_thread(openai.ChatCompletion.create,
-                                           model=self.model,
-                                           messages=self.gpt_context,
-                                           timeout=TIMEOUT
-                                           )
+
+        try:
+            response = await asyncio.to_thread(openai.ChatCompletion.create,
+                                               model=self.model,
+                                               messages=self.gpt_context,
+                                               timeout=TIMEOUT
+                                               )
+        except (openai.error.Timeout, openai.error.APIError, openai.error.APIConnectionError,
+                openai.error.InvalidRequestError, openai.error.AuthenticationError,
+                openai.error.PermissionError, openai.error.RateLimitError) as error:
+            print(f"Slide: {slide_number} was not processed because of the following error: {error}")
+            return
 
         print(f"Slide {slide_number} processed!")
 
@@ -72,20 +79,3 @@ class GptExplainer:
         :return: the explanations_slides list
         """
         return self.explanations_slides
-
-
-async def main():
-    # Initialize the class
-    gpt_explainer = GptExplainer()
-
-    # Send the text of the slides to the gpt-3.5-turbo model
-    await asyncio.gather(gpt_explainer.send_slide_text_to_gpt(1, "Asyncio"),
-                         gpt_explainer.send_slide_text_to_gpt(2, "Concurrency"),
-                         gpt_explainer.send_slide_text_to_gpt(3, "Multiprocessing"))
-
-    # Print the explanations of the slides
-    print(gpt_explainer.get_explanations_slides())
-
-
-if __name__ == '__main__':
-    asyncio.run(main())
