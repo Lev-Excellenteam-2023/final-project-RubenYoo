@@ -85,7 +85,6 @@ async def main():
                          gpt_explainer.send_slide_text_to_gpt(2, "Concurrency"),
                          gpt_explainer.send_slide_text_to_gpt(3, "Multiprocessing"))
 
-
     # Print the explanations of the slides
     print(gpt_explainer.get_explanations_slides())
 
