@@ -1,6 +1,6 @@
-import powerpoint_parser
-import gpt_explainer
-import gather_explanations_to_json
+import Parser.powerpoint_parser as powerpoint_parser
+import Gpt_explainer.gpt_explainer as gpt_explainer
+import Utils.gather_explanations_to_json as gather_explanations_to_json
 import asyncio
 import argparse
 
