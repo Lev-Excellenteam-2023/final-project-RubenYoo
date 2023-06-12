@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, make_response
 import uuid
 import time
 import os
@@ -21,7 +21,7 @@ def upload_file():
     uid = uuid.uuid5(namespace, secret_string)
 
     # Save the file
-    file.save(f'uploads/{uid} {timestamp} {file.filename}.pptx')
+    file.save(f'uploads/{uid} {timestamp} {file.filename}')
 
     return {'uid': str(uid)}
 
@@ -33,25 +33,42 @@ def get_pptx_parsed(uid):
     file_name = None
     timestamp = None
     explanation = None
+    http_code = 404
+    status = 'not found'
 
-    # uid not uploaded
-    if uid not in [os.path.splitext(os.path.basename(file_path))[0] for file_path in glob.glob(uploads_pattern) if not
-                   os.path.isdir(file_path)]:
-        status = 'not found'
+    for file_path in glob.glob(uploads_pattern):
+        file_full_name = str(os.path.splitext(os.path.basename(file_path))[0])
+        uid_file = file_full_name.split(' ')[0]
+        print(uid_file)
+        timestamp_file = file_full_name.split(' ')[1]
+        print(timestamp_file)
+        file_real_name = ' '.join(file_full_name.split(' ')[2:])
+        print(file_real_name)
 
-    # uid not processed
-    elif uid not in [os.path.splitext(os.path.basename(file_path))[0] for file_path in glob.glob(outputs_pattern) if
-                     not os.path.isdir(file_path)]:
-        status = 'pending'
+        if uid_file == uid:
+            file_name = file_real_name
+            timestamp = timestamp_file
+            http_code = 200
+            if uid not in [os.path.splitext(os.path.basename(file_path))[0] for file_path in
+                           glob.glob(outputs_pattern) if not
+                           os.path.isdir(file_path)]:
+                status = 'pending'
+            else:
+                status = 'done'
+                with open(f'./outputs/{uid} {timestamp} {file_name}.json', 'r') as file:
+                    explanation = json.load(file)
 
-    # file is processed
-    else:
-        status = 'done'
-        with open(f'./outputs/{uid}.json', 'r') as file:
-            explanation = json.load(file)
+    response_data = {
+        "status": status,
+        "filename": file_name,
+        "timestamp": timestamp,
+        "explanation": explanation
+    }
 
-    return {"status": status, "filename": file_name, "timestamp": timestamp, "explanation": explanation}
+    response = make_response(response_data)
+    response.status_code = http_code
+    return response
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
