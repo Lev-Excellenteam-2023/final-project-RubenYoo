@@ -4,7 +4,7 @@ import os
 URL = 'http://127.0.0.1:5000/'
 
 
-def send_file(path):
+def send_file(path: str) -> str:
     with open(path, 'rb') as file:
         response = requests.post(URL, files={'file': file})
 
