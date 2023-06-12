@@ -14,6 +14,10 @@ def send_file(path):
         raise Exception(response.text)
 
 
+def send_uid(uid):
+    return requests.get(URL + uid)
+
+
 def main():
     file_path = input("Enter the PowerPoint file path\n")
 
