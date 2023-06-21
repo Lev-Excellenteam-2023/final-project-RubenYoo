@@ -49,9 +49,8 @@ def get_pptx_parsed(uid):
             file_name = file_real_name
             timestamp = timestamp_file
             http_code = 200
-            if uid not in [os.path.splitext(os.path.basename(file_path))[0] for file_path in
-                           glob.glob(outputs_pattern) if not
-                           os.path.isdir(file_path)]:
+            if uid not in [os.path.splitext(os.path.basename(file_path))[0].split(' ')[0] for file_path in
+                           glob.glob(outputs_pattern)]:
                 status = 'pending'
             else:
                 status = 'done'

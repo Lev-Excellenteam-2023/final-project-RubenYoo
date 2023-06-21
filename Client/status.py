@@ -8,7 +8,7 @@ class Status:
     explanation: str
 
     def __init__(self, json_data: json) -> None:
-        my_data = json.load(json_data)
+        my_data = dict(json_data)
         self.status = my_data['status']
         self.filename = my_data['filename']
         self.timestamp = my_data['timestamp']
@@ -23,3 +23,6 @@ class Status:
         if self.status == 'not found':
             return True
         return False
+
+    def get_explanation(self) -> str:
+        return self.explanation

@@ -1,3 +1,4 @@
+from typing import Type
 import requests
 import os
 from status import Status
@@ -15,14 +16,15 @@ def send_file(path: str) -> str:
         raise Exception(response.text)
 
 
-def send_uid(uid: str):
+def send_uid(uid: str) -> Status:
     response = requests.get(URL + uid)
-    my_status = Status
-    my_status(response)
-    if response.status_code == 200 and my_status.is_done:
+    my_status = Status(response.json())
+    if response.status_code == 200 and my_status.is_done():
         return my_status
-    elif response.status_code == 400 and my_status.is_not_found:
+    elif response.status_code == 404 and my_status.is_not_found():
         raise Exception("UID not found")
+    else:
+        raise Exception("the request failed")
 
 
 def main():
@@ -43,7 +45,7 @@ def main():
                 case '2':
                     uid = input("Enter the uid\n")
                     response = send_uid(uid)
-                    print(response.explanation)
+                    print(response.get_explanation())
         except Exception as e:
             print(f"Error {e}")
 
