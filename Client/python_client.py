@@ -1,4 +1,4 @@
-from typing import Type
+import argparse
 import requests
 import os
 from status import Status
@@ -28,26 +28,27 @@ def send_uid(uid: str) -> Status:
 
 
 def main():
-    print("Welcome to the GTP-Explainer client")
+    parser = argparse.ArgumentParser(description="Upload a Powerpoint file, or send a UID")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-upload', metavar='<file path>', help='Upload a file')
+    group.add_argument('-check', metavar='<uid>', help='Check UID')
+    args = parser.parse_args()
 
-    while True:
-        choice = input("Do you want to upload a PowerPoint file or enter a uid? (1/2)\n")
-        try:
-            match choice:
-                case '0':
-                    return
-                case '1':
-                    file_path = input("Enter the PowerPoint file path\n")
-                    if not os.path.isfile(file_path):
-                        raise Exception("this file not exist")
-                    uid = send_file(file_path)
-                    print(f"The uid is {uid}")
-                case '2':
-                    uid = input("Enter the uid\n")
-                    response = send_uid(uid)
-                    print(response.get_explanation())
-        except Exception as e:
-            print(f"Error {e}")
+    try:
+        if args.upload:
+            file_path = args.upload
+            if not os.path.isfile(file_path):
+                raise Exception("this file not exist")
+            uid = send_file(file_path)
+            print(f"The uid is {uid}")
+        elif args.check:
+            uid = args.check
+            response = send_uid(uid)
+            print(response.get_explanation())
+        else:
+            raise Exception("in the params")
+    except Exception as e:
+        print(f"Error {e}")
 
 
 if __name__ == '__main__':
