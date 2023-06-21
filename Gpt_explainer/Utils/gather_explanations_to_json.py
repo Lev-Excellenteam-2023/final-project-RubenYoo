@@ -21,5 +21,5 @@ def save_to_json(list_of_explanations: list, path: str) -> None:
     :return: None
     """
     
-    with open(os.path.splitext(os.path.basename(path))[0] + '.json', 'w') as my_file:
+    with open('../Web_api/outputs/' + os.path.splitext(os.path.basename(path))[0] + '.json', 'w') as my_file:
         json.dump(sort_explanations(list_of_explanations), my_file)

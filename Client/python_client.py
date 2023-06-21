@@ -36,7 +36,7 @@ def main():
                     return
                 case '1':
                     file_path = input("Enter the PowerPoint file path\n")
-                    if not os.path.exists(file_path):
+                    if not os.path.isfile(file_path):
                         raise Exception("this file not exist")
                     uid = send_file(file_path)
                     print(f"The uid is {uid}")
