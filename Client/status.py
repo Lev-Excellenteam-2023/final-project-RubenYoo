@@ -19,3 +19,7 @@ class Status:
             return True
         return False
 
+    def is_not_found(self) -> bool:
+        if self.status == 'not found':
+            return True
+        return False
