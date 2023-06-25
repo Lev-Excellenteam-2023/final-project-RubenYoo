@@ -4,6 +4,7 @@ import time
 import os
 import Client.python_client
 import Client.status
+import multiprocessing
 
 
 class MyTestCase(unittest.TestCase):
@@ -22,20 +23,23 @@ class MyTestCase(unittest.TestCase):
             process = subprocess.Popen(['python', script])
             self.processes.append(process)
 
-        time.sleep(5)
         my_client = Client.python_client.PythonClient()
 
         try:
             uid = my_client.send_file(os.path.abspath(self.file_path))
             print(uid)
-            time.sleep(10)
+
             my_status = Client.status.Status(my_client.send_uid(uid))
-            print(my_status)
+            while my_status.is_not_found():
+                my_status = Client.status.Status(my_client.send_uid(uid))
+
+            print(my_status.get_explanation())
+
         except Exception as e:
             print(e)
 
         for process in self.processes:
-            process.kill()
+            process.terminate()
 
 
 def main():
