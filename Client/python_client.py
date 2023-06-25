@@ -5,10 +5,19 @@ import status
 
 
 class PythonClient:
+    """
+    This class represents the python client
+    """
     def __init__(self):
         self.url = 'http://127.0.0.1:5000/'
 
     def send_file(self, path: str) -> str:
+        """
+        This function sends a file to the server
+        :param path: the path of the file
+        :return: the uid of the file
+        """
+
         with open(path, 'rb') as file:
             response = requests.post(self.url, files={'file': file})
 
@@ -18,6 +27,12 @@ class PythonClient:
             raise Exception(response.text)
 
     def send_uid(self, uid: str) -> status.Status:
+        """
+        This function sends an uid to the server
+        :param uid: the uid of the file
+        :return: the status of the file
+        """
+
         response = requests.get(self.url + uid)
         my_status = status.Status(response.json())
         if response.status_code == 200 and my_status.is_done():
@@ -29,6 +44,12 @@ class PythonClient:
 
 
 def main():
+    """
+    This function is the main function
+    of the python client
+    it sends a file or an uid to the server, and prints the response
+    """
+
     parser = argparse.ArgumentParser(description="Upload a Powerpoint file, or send a UID")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-upload', metavar='<file path>', help='Upload a file')

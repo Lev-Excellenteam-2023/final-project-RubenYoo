@@ -10,6 +10,11 @@ app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
 def upload_file():
+    """
+    Upload a file to the server
+    :return: a json with the uid of the file
+    """
+
     # Access the uploaded file
     file = request.files['file']
     timestamp = time.time()
@@ -28,6 +33,12 @@ def upload_file():
 
 @app.route('/<uid>', methods=['GET'])
 def get_pptx_parsed(uid):
+    """
+    Get the parsed file
+    :param uid: the uid of the file
+    :return: a json with the status of the file
+    """
+
     uploads_pattern = './uploads/*.pptx'
     outputs_pattern = './outputs/*.json'
     file_name = None

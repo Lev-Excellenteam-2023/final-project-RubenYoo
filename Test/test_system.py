@@ -7,6 +7,10 @@ import Client.status
 
 class MyTestCase(unittest.TestCase):
     def test_system(self):
+        """
+        This function tests the system
+        """
+
         self.file_path = "../asyncio-intro.pptx"
 
         self.scripts = ['../Web_api/app.py', '../Gpt_explainer/main.py']

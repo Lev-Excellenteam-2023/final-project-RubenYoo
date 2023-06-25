@@ -8,6 +8,11 @@ import time
 
 
 async def main():
+    """
+    This function is used to process the PowerPoint presentations in the uploads folder and save the explanations in
+    the outputs folder.
+    """
+
     pattern = '../Web_api/uploads/*.pptx'
     pattern2 = '../Web_api/outputs/*.json'
     my_pptx = set()
