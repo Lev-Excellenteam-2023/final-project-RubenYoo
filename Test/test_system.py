@@ -30,7 +30,7 @@ class MyTestCase(unittest.TestCase):
             print(uid)
 
             my_status = Client.status.Status(my_client.send_uid(uid))
-            while my_status.is_not_found():
+            while not my_status.is_done():
                 my_status = Client.status.Status(my_client.send_uid(uid))
 
             print(my_status.get_explanation())
