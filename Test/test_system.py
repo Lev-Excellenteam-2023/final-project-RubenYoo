@@ -1,28 +1,32 @@
 import subprocess
-
 import unittest
+import time
+import python_client
+import status
 
 
 class MyTestCase(unittest.TestCase):
     def test_system(self):
         self.file_path = "../asyncio-intro.pptx"
 
-        self.script_args = [
-            '../Web_api/app.py',
-            '../Gpt_explainer/main.py',
-            ('../Client/python_client.py', '-upload', f'{self.file_path}'),
-            ('../Client/python_client.py', '-check', f'{self.file_path}')
-        ]
+        self.scripts = ['../Web_api/app.py', '../Gpt_explainer/main.py']
 
         self.processes = []
 
-        for script, *args in self.script_args[:2]:
-            command = ['python', script] + list(args)
-            process = subprocess.Popen(command)
+        for script in self.scripts:
+            process = subprocess.Popen(['python', script])
             self.processes.append(process)
 
+        time.sleep(5)
+        my_client = python_client.PythonClient()
+        uid = my_client.send_file(self.file_path)
+        time.sleep(10)
+        my_status = status.Status(my_client.send_uid(uid))
+
+        print(my_status)
+
         for process in self.processes:
-            process.wait()
+            process.kill()
 
 
 def main():

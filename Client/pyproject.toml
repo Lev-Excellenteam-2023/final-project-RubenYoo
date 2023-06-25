@@ -1,5 +1,5 @@
 [project]
-name = "gpt_explainer_client"
+name = "gptExplainerClient"
 version = "0.0.1"
 description = "API to talk with the GPT-Explainer"
 dependencies = [
@@ -8,5 +8,8 @@ dependencies = [
     'importlib-metadata; python_version<"3.8"',
 ]
 
-[tool.setuptools.packages]
-find = {}
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+exclude = [""]
+namespaces = false
