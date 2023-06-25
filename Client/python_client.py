@@ -1,7 +1,7 @@
 import argparse
 import requests
 import os
-import status
+from Client import status
 
 
 class PythonClient:

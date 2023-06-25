@@ -1,7 +1,9 @@
 import subprocess
 import unittest
 import time
-import Client
+import os
+import Client.python_client
+import Client.status
 
 
 class MyTestCase(unittest.TestCase):
@@ -22,11 +24,15 @@ class MyTestCase(unittest.TestCase):
 
         time.sleep(5)
         my_client = Client.python_client.PythonClient()
-        uid = my_client.send_file(self.file_path)
-        time.sleep(10)
-        my_status = Client.status.Status(my_client.send_uid(uid))
 
-        print(my_status)
+        try:
+            uid = my_client.send_file(os.path.abspath(self.file_path))
+            print(uid)
+            time.sleep(10)
+            my_status = Client.status.Status(my_client.send_uid(uid))
+            print(my_status)
+        except Exception as e:
+            print(e)
 
         for process in self.processes:
             process.kill()
