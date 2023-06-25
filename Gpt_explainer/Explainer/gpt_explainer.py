@@ -53,7 +53,6 @@ class GptExplainer:
         self.gpt_context.append({"role": "user", "content": text_of_slide})
 
         # Generate a response from the model
-
         try:
             response = await asyncio.to_thread(openai.ChatCompletion.create,
                                                model=self.model,

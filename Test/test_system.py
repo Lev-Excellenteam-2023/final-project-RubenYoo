@@ -1,8 +1,7 @@
 import subprocess
 import unittest
 import time
-import Client.python_client
-import Client.status
+import Client
 
 
 class MyTestCase(unittest.TestCase):
