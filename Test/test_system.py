@@ -1,8 +1,8 @@
 import subprocess
 import unittest
 import time
-import python_client
-import status
+import Client.python_client
+import Client.status
 
 
 class MyTestCase(unittest.TestCase):
@@ -18,10 +18,10 @@ class MyTestCase(unittest.TestCase):
             self.processes.append(process)
 
         time.sleep(5)
-        my_client = python_client.PythonClient()
+        my_client = Client.python_client.PythonClient()
         uid = my_client.send_file(self.file_path)
         time.sleep(10)
-        my_status = status.Status(my_client.send_uid(uid))
+        my_status = Client.status.Status(my_client.send_uid(uid))
 
         print(my_status)
 
