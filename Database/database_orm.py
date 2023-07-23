@@ -42,6 +42,5 @@ class Upload(Base):
         pass
 
 
-# Define the database engine and create the tables
 engine = create_engine('sqlite:///db/mydatabase.db', echo=True)
 Base.metadata.create_all(engine)
