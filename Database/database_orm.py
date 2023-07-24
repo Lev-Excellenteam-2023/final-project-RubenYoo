@@ -30,7 +30,7 @@ class Upload(Base):
     finish_time = Column(DateTime)
     status = Column(Enum(UploadStatus), default=UploadStatus.PENDING)
 
-    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), nullable=True)
     user = relationship('User', back_populates='uploads')
 
     def upload_path(self):
@@ -42,5 +42,7 @@ class Upload(Base):
         pass
 
 
-engine = create_engine('sqlite:///db/mydatabase.db', echo=True)
-Base.metadata.create_all(engine)
+if __name__ == '__main__':
+    engine = create_engine('sqlite:///db/mydatabase.db', echo=True)
+    Base.metadata.create_all(engine)
+

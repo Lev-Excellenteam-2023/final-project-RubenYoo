@@ -4,6 +4,10 @@ import time
 import os
 import json
 import glob
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from Database.database_orm import Upload, User
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -24,6 +28,21 @@ def upload_file():
 
     # Generate a random UUID as the namespace
     uid = uuid.uuid5(namespace, secret_string)
+
+    # Access optional email parameter
+    email = request.form.get('email')
+
+    # Create an Upload object and commit it to the database
+    db_path = os.path.join(os.path.dirname(__file__), '../Database/db/mydatabase.db')
+    engine = create_engine(f'sqlite:///{db_path}', echo=True)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    upload = Upload(uid=str(uid), filename=file.filename,
+                    upload_time=datetime.now(),
+                    user=None if email is None else session.query(User).filter_by(email=email).first())
+    session.add(upload)
+    session.commit()
+    session.close()
 
     # Save the file
     file.save(f'uploads/{uid} {timestamp} {file.filename}')
