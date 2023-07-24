@@ -28,7 +28,7 @@ async def main():
             uid = upload.uid
             filename = upload.filename
 
-            path = f'../Web_api/uploads/{uid}'
+            path = f'../Web_api/uploads/{uid}.pptx'
 
             if not os.path.exists(path):
                 print("File not found")

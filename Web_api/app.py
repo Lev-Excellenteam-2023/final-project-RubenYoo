@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, request, make_response, jsonify
 import uuid
 import time
@@ -76,10 +78,17 @@ def get_status_by_uid(uid):
     if not upload:
         return make_response(jsonify({'status': 'not found'}), 404)
 
+    if not upload.status.value == 'done':
+        explanation = None
+    else:
+        file = open(f'./outputs/{uid}.json', 'r')
+        explanation = json.load(file)
+
     response_data = {
         "status": str(upload.status.value),
         "filename": str(upload.filename),
-        "finish time": str(upload.finish_time)
+        "finish time": str(upload.finish_time),
+        "explanation": explanation
     }
 
     return make_response(jsonify(response_data), 200)
@@ -105,10 +114,17 @@ def get_status_email_filename(email, filename):
     if not upload:
         return make_response(jsonify({'status': 'not found'}), 404)
 
+    if not upload.status.value == 'done':
+        explanation = None
+    else:
+        file = open(f'./outputs/{uid}.json', 'r')
+        explanation = json.load(file)
+
     response_data = {
         "status": str(upload.status.value),
         "filename": str(upload.filename),
-        "finish time": str(upload.finish_time)
+        "finish time": str(upload.finish_time),
+        "explanation": explanation
     }
 
     return make_response(jsonify(response_data), 200)
