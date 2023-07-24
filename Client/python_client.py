@@ -37,7 +37,11 @@ class PythonClient:
         :return: the status of the file
         """
 
-        response = requests.get(self.url + uid)
+        data = {
+            'uid': {uid}
+        }
+
+        response = requests.get(self.url + "status", params=data)
         my_status = status.Status(response.json())
         if response.status_code == 200:
             return my_status
@@ -54,7 +58,12 @@ class PythonClient:
         :return: the status of the file
         """
 
-        response = requests.get(self.url + f'{email}/{filename}')
+        data = {
+            'email': {email},
+            'filename': {filename}
+        }
+
+        response = requests.get(self.url + "status", params=data)
         my_status = status.Status(response.json())
 
         if response.status_code == 200:
@@ -73,7 +82,6 @@ def main():
     """
 
     parser = argparse.ArgumentParser(description="Upload a Powerpoint file, or send a UID")
-    # group = parser.add_mutually_exclusive_group(required=True)
     parser.add_argument('-upload', metavar='<file path>', help='Upload a file')
     parser.add_argument('-check', metavar='<uid>', help='Check UID')
     parser.add_argument('-email', metavar='<email>', help='Email of the file uploader')

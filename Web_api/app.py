@@ -60,11 +60,10 @@ def upload_file():
     return {'uid': str(uid)}
 
 
-@app.route('/<uid>', methods=['GET'])
-def get_status_by_uid(uid):
+@app.route('/status', methods=['GET'])
+def get_status():
     """
     Get status of a pptx file
-    :param uid: the uid of the file
     :return: a json with the status of the file
     """
 
@@ -72,7 +71,17 @@ def get_status_by_uid(uid):
     engine = create_engine(f'sqlite:///../Database/db/mydatabase.db', echo=True)
     Session = sessionmaker(bind=engine)
     session = Session()
-    upload = session.query(Upload).filter_by(uid=uid).first()
+
+    uid = request.args.get('uid')
+    email = request.args.get('email')
+    filename = request.args.get('filename')
+
+    if uid:
+        upload = session.query(Upload).filter_by(uid=str(uid)).first()
+    else:
+        user = session.query(User).filter_by(email=email).first()
+        upload = session.query(Upload).filter_by(user_id=user.id, filename=filename).first()
+
     session.close()
 
     if not upload:
@@ -81,43 +90,7 @@ def get_status_by_uid(uid):
     if not upload.status.value == 'done':
         explanation = None
     else:
-        file = open(f'./outputs/{uid}.json', 'r')
-        explanation = json.load(file)
-
-    response_data = {
-        "status": str(upload.status.value),
-        "filename": str(upload.filename),
-        "finish time": str(upload.finish_time),
-        "explanation": explanation
-    }
-
-    return make_response(jsonify(response_data), 200)
-
-
-@app.route('/<email>/<filename>', methods=['GET'])
-def get_status_email_filename(email, filename):
-    """
-    Get status of a pptx file
-    :param email: the uid of the file
-    :param filename: the filename of the file
-    :return: a json with the status of the file
-    """
-
-    # Fetch the upload from the DB
-    engine = create_engine(f'sqlite:///../Database/db/mydatabase.db', echo=True)
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    user = session.query(User).filter_by(email=email).first()
-    upload = session.query(Upload).filter_by(user_id=user.id, filename=filename).first()
-    session.close()
-
-    if not upload:
-        return make_response(jsonify({'status': 'not found'}), 404)
-
-    if not upload.status.value == 'done':
-        explanation = None
-    else:
-        file = open(f'./outputs/{uid}.json', 'r')
+        file = open(f'./outputs/{upload.uid}.json', 'r')
         explanation = json.load(file)
 
     response_data = {

@@ -40,7 +40,7 @@ class Status:
         """
         This function returns the explanation
         """
-        return self.explanation
+        return ''.join(self.explanation)
 
     def get_response(self) -> str:
         """
@@ -49,4 +49,4 @@ class Status:
         return f"Status: {self.status}\n" \
                f"Filename: {self.filename}\n" \
                f"Finish time: {self.finish_time}\n" \
-               f"Explanation: {self.get_explanation()}\n"
+               f"Explanation:\n{self.get_explanation()}\n"
