@@ -39,7 +39,7 @@ class PythonClient:
 
         response = requests.get(self.url + uid)
         my_status = status.Status(response.json())
-        if response.status_code == 200 and my_status.is_done():
+        if response.status_code == 200:
             return my_status
         elif response.status_code == 404 and my_status.is_not_found():
             raise Exception("UID not found")
@@ -54,10 +54,10 @@ class PythonClient:
         :return: the status of the file
         """
 
-        response = requests.get(self.url + f'status/{email}/{filename}')
+        response = requests.get(self.url + f'{email}/{filename}')
         my_status = status.Status(response.json())
 
-        if response.status_code == 200 and my_status.is_done():
+        if response.status_code == 200:
             return my_status
         elif response.status_code == 404 and my_status.is_not_found():
             raise Exception("File not found for the provided email and filename")
@@ -73,12 +73,11 @@ def main():
     """
 
     parser = argparse.ArgumentParser(description="Upload a Powerpoint file, or send a UID")
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-upload', metavar='<file path>', help='Upload a file')
-    group.add_argument('-check', metavar='<uid>', help='Check UID')
-    parser.add_argument('-email', metavar='<email>', help='Email of the file uploader (optional)', default=None)
-    parser.add_argument('-filename', metavar='<filename>', help='Filename to check the status for (optional)',
-                        default=None)
+    # group = parser.add_mutually_exclusive_group(required=True)
+    parser.add_argument('-upload', metavar='<file path>', help='Upload a file')
+    parser.add_argument('-check', metavar='<uid>', help='Check UID')
+    parser.add_argument('-email', metavar='<email>', help='Email of the file uploader')
+    parser.add_argument('-filename', metavar='<filename>', help='Filename to check the status for (optional)')
     args = parser.parse_args()
 
     try:
@@ -92,10 +91,10 @@ def main():
         elif args.check:
             uid = args.check
             response = my_client.send_uid(uid)
-            print(response.get_explanation())
+            print(response.get_response())
         elif args.email and args.filename:
             response = my_client.send_status(args.email, args.filename)
-            print(response.get_explanation())
+            print(response.get_response())
         else:
             raise Exception("Invalid parameters")
     except Exception as e:

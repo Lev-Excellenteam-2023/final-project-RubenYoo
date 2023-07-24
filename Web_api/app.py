@@ -1,9 +1,6 @@
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, jsonify
 import uuid
 import time
-import os
-import json
-import glob
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from Database.database_orm import Upload, User
@@ -62,52 +59,59 @@ def upload_file():
 
 
 @app.route('/<uid>', methods=['GET'])
-def get_pptx_parsed(uid):
+def get_status_by_uid(uid):
     """
-    Get the parsed file
+    Get status of a pptx file
     :param uid: the uid of the file
     :return: a json with the status of the file
     """
 
-    uploads_pattern = './uploads/*.pptx'
-    outputs_pattern = './outputs/*.json'
-    file_name = None
-    timestamp = None
-    explanation = None
-    http_code = 404
-    status = 'not found'
+    # Fetch the upload from the DB
+    engine = create_engine(f'sqlite:///../Database/db/mydatabase.db', echo=True)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    upload = session.query(Upload).filter_by(uid=uid).first()
+    session.close()
 
-    for file_path in glob.glob(uploads_pattern):
-        file_full_name = str(os.path.splitext(os.path.basename(file_path))[0])
-        uid_file = file_full_name.split(' ')[0]
-        print(uid_file)
-        timestamp_file = file_full_name.split(' ')[1]
-        print(timestamp_file)
-        file_real_name = ' '.join(file_full_name.split(' ')[2:])
-        print(file_real_name)
-
-        if uid_file == uid:
-            file_name = file_real_name
-            timestamp = timestamp_file
-            http_code = 200
-            if uid not in [os.path.splitext(os.path.basename(file_path))[0].split(' ')[0] for file_path in
-                           glob.glob(outputs_pattern)]:
-                status = 'pending'
-            else:
-                status = 'done'
-                with open(f'./outputs/{uid} {timestamp} {file_name}.json', 'r') as file:
-                    explanation = json.load(file)
+    if not upload:
+        return make_response(jsonify({'status': 'not found'}), 404)
 
     response_data = {
-        "status": status,
-        "filename": file_name,
-        "timestamp": timestamp,
-        "explanation": explanation
+        "status": str(upload.status.value),
+        "filename": str(upload.filename),
+        "finish time": str(upload.finish_time)
     }
 
-    response = make_response(response_data)
-    response.status_code = http_code
-    return response
+    return make_response(jsonify(response_data), 200)
+
+
+@app.route('/<email>/<filename>', methods=['GET'])
+def get_status_email_filename(email, filename):
+    """
+    Get status of a pptx file
+    :param email: the uid of the file
+    :param filename: the filename of the file
+    :return: a json with the status of the file
+    """
+
+    # Fetch the upload from the DB
+    engine = create_engine(f'sqlite:///../Database/db/mydatabase.db', echo=True)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    user = session.query(User).filter_by(email=email).first()
+    upload = session.query(Upload).filter_by(user_id=user.id, filename=filename).first()
+    session.close()
+
+    if not upload:
+        return make_response(jsonify({'status': 'not found'}), 404)
+
+    response_data = {
+        "status": str(upload.status.value),
+        "filename": str(upload.filename),
+        "finish time": str(upload.finish_time)
+    }
+
+    return make_response(jsonify(response_data), 200)
 
 
 if __name__ == '__main__':

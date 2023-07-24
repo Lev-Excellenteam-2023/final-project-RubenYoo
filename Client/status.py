@@ -8,15 +8,15 @@ class Status:
 
     status: str
     filename: str
-    timestamp: str
-    explanation: str
+    finish_time: str
+    # explanation: str
 
     def __init__(self, json_data: json) -> None:
         my_data = dict(json_data)
-        self.status = my_data['status']
-        self.filename = my_data['filename']
-        self.timestamp = my_data['timestamp']
-        self.explanation = my_data['explanation']
+        self.status = my_data.get('status')
+        self.filename = my_data.get('filename')
+        self.finish_time = my_data.get('finish time')
+        # self.explanation = my_data['explanation']
 
     def is_done(self) -> bool:
         """
@@ -36,8 +36,10 @@ class Status:
             return True
         return False
 
-    def get_explanation(self) -> str:
+    def get_response(self) -> str:
         """
-        This function returns the explanation
+        This function returns the response
         """
-        return self.explanation
+        return f"Status: {self.status}\n" \
+               f"Filename: {self.filename}\n" \
+               f"Finish time: {self.finish_time}\n"
