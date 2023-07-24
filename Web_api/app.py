@@ -33,13 +33,24 @@ def upload_file():
     email = request.form.get('email')
 
     # Create an Upload object and commit it to the database
-    db_path = os.path.join(os.path.dirname(__file__), '../Database/db/mydatabase.db')
-    engine = create_engine(f'sqlite:///{db_path}', echo=True)
+
+    engine = create_engine(f'sqlite:///../Database/db/mydatabase.db', echo=True)
     Session = sessionmaker(bind=engine)
     session = Session()
+
+    if email:
+        user = session.query(User).filter_by(email=email).first()
+        if user is None:
+            user = User(email=email)
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+    else:
+        user = None
+
     upload = Upload(uid=str(uid), filename=file.filename,
                     upload_time=datetime.now(),
-                    user=None if email is None else session.query(User).filter_by(email=email).first())
+                    user=user)
     session.add(upload)
     session.commit()
     session.close()

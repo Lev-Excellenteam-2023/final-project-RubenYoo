@@ -11,15 +11,19 @@ class PythonClient:
     def __init__(self):
         self.url = 'http://127.0.0.1:5000/'
 
-    def send_file(self, path: str) -> str:
+    def send_file(self, path: str, email: str = None) -> str:
         """
         This function sends a file to the server
         :param path: the path of the file
+        :param email: optional email to attach to the file
         :return: the uid of the file
         """
 
         with open(path, 'rb') as file:
-            response = requests.post(self.url, files={'file': file})
+            if email:
+                response = requests.post(self.url, files={'file': file}, data={'email': email})
+            else:
+                response = requests.post(self.url, files={'file': file})
 
         if response.status_code == 200:
             return response.json()['uid']
@@ -42,6 +46,24 @@ class PythonClient:
         else:
             raise Exception("the request failed")
 
+    def send_status(self, email: str, filename: str) -> status.Status:
+        """
+        This function sends an email and filename to the server to check the status
+        :param email: the email of the file uploader
+        :param filename: the filename to check the status for
+        :return: the status of the file
+        """
+
+        response = requests.get(self.url + f'status/{email}/{filename}')
+        my_status = status.Status(response.json())
+
+        if response.status_code == 200 and my_status.is_done():
+            return my_status
+        elif response.status_code == 404 and my_status.is_not_found():
+            raise Exception("File not found for the provided email and filename")
+        else:
+            raise Exception("The request failed")
+
 
 def main():
     """
@@ -54,6 +76,9 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-upload', metavar='<file path>', help='Upload a file')
     group.add_argument('-check', metavar='<uid>', help='Check UID')
+    parser.add_argument('-email', metavar='<email>', help='Email of the file uploader (optional)', default=None)
+    parser.add_argument('-filename', metavar='<filename>', help='Filename to check the status for (optional)',
+                        default=None)
     args = parser.parse_args()
 
     try:
@@ -61,17 +86,20 @@ def main():
         if args.upload:
             file_path = args.upload
             if not os.path.isfile(file_path):
-                raise Exception("this file not exist")
-            uid = my_client.send_file(file_path)
+                raise Exception("This file does not exist")
+            uid = my_client.send_file(file_path, email=args.email)
             print(f"The uid is {uid}")
         elif args.check:
             uid = args.check
             response = my_client.send_uid(uid)
             print(response.get_explanation())
+        elif args.email and args.filename:
+            response = my_client.send_status(args.email, args.filename)
+            print(response.get_explanation())
         else:
-            raise Exception("in the params")
+            raise Exception("Invalid parameters")
     except Exception as e:
-        print(f"Error {e}")
+        print(f"Error: {e}")
 
 
 if __name__ == '__main__':
