@@ -4,7 +4,6 @@ import time
 import os
 import Client.python_client
 import Client.status
-import multiprocessing
 
 
 class MyTestCase(unittest.TestCase):
@@ -31,6 +30,7 @@ class MyTestCase(unittest.TestCase):
 
             my_status = Client.status.Status(my_client.send_uid(uid))
             while not my_status.is_done():
+                time.sleep(5)
                 my_status = Client.status.Status(my_client.send_uid(uid))
 
             print(my_status.get_explanation())

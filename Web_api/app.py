@@ -1,9 +1,12 @@
-from flask import Flask, request, make_response
+import json
+
+from flask import Flask, request, make_response, jsonify
 import uuid
 import time
-import os
-import json
-import glob
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from Database.database_orm import Upload, User
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -15,69 +18,81 @@ def upload_file():
     :return: a json with the uid of the file
     """
 
-    # Access the uploaded file
     file = request.files['file']
     timestamp = time.time()
 
     secret_string = file.filename + str(timestamp)
     namespace = uuid.uuid4()
-
-    # Generate a random UUID as the namespace
     uid = uuid.uuid5(namespace, secret_string)
 
-    # Save the file
-    file.save(f'uploads/{uid} {timestamp} {file.filename}')
+    email = request.form.get('email')
+
+    engine = create_engine(f'sqlite:///../Database/db/mydatabase.db', echo=True)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    if email:
+        user = session.query(User).filter_by(email=email).first()
+        if user is None:
+            user = User(email=email)
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+    else:
+        user = None
+
+    upload = Upload(uid=str(uid), filename=file.filename,
+                    upload_time=datetime.now(),
+                    user=user)
+    session.add(upload)
+    session.commit()
+    session.close()
+
+    file.save(f'uploads/{uid}.pptx')
 
     return {'uid': str(uid)}
 
 
-@app.route('/<uid>', methods=['GET'])
-def get_pptx_parsed(uid):
+@app.route('/status', methods=['GET'])
+def get_status():
     """
-    Get the parsed file
-    :param uid: the uid of the file
+    Get status of a pptx file
     :return: a json with the status of the file
     """
 
-    uploads_pattern = './uploads/*.pptx'
-    outputs_pattern = './outputs/*.json'
-    file_name = None
-    timestamp = None
-    explanation = None
-    http_code = 404
-    status = 'not found'
+    engine = create_engine(f'sqlite:///../Database/db/mydatabase.db', echo=True)
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
-    for file_path in glob.glob(uploads_pattern):
-        file_full_name = str(os.path.splitext(os.path.basename(file_path))[0])
-        uid_file = file_full_name.split(' ')[0]
-        print(uid_file)
-        timestamp_file = file_full_name.split(' ')[1]
-        print(timestamp_file)
-        file_real_name = ' '.join(file_full_name.split(' ')[2:])
-        print(file_real_name)
+    uid = request.args.get('uid')
+    email = request.args.get('email')
+    filename = request.args.get('filename')
 
-        if uid_file == uid:
-            file_name = file_real_name
-            timestamp = timestamp_file
-            http_code = 200
-            if uid not in [os.path.splitext(os.path.basename(file_path))[0].split(' ')[0] for file_path in
-                           glob.glob(outputs_pattern)]:
-                status = 'pending'
-            else:
-                status = 'done'
-                with open(f'./outputs/{uid} {timestamp} {file_name}.json', 'r') as file:
-                    explanation = json.load(file)
+    if uid:
+        upload = session.query(Upload).filter_by(uid=str(uid)).first()
+    else:
+        user = session.query(User).filter_by(email=email).first()
+        upload = session.query(Upload).filter_by(user_id=user.id, filename=filename).first()
+
+    session.close()
+
+    if not upload:
+        return make_response(jsonify({'status': 'not found'}), 404)
+
+    if not upload.status.value == 'done':
+        explanation = None
+    else:
+        file = open(f'./outputs/{upload.uid}.json', 'r')
+        explanation = json.load(file)
 
     response_data = {
-        "status": status,
-        "filename": file_name,
-        "timestamp": timestamp,
+        "status": str(upload.status.value),
+        "filename": str(upload.filename),
+        "finish time": str(upload.finish_time),
         "explanation": explanation
     }
 
-    response = make_response(response_data)
-    response.status_code = http_code
-    return response
+    return make_response(jsonify(response_data), 200)
 
 
 if __name__ == '__main__':
