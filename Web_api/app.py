@@ -53,7 +53,7 @@ def upload_file():
     session.close()
 
     # Save the file
-    file.save(f'uploads/{uid} {timestamp} {file.filename}')
+    file.save(f'uploads/{uid}.pptx')
 
     return {'uid': str(uid)}
 

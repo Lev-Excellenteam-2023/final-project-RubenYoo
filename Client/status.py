@@ -9,14 +9,12 @@ class Status:
     status: str
     filename: str
     finish_time: str
-    # explanation: str
 
     def __init__(self, json_data: json) -> None:
         my_data = dict(json_data)
         self.status = my_data.get('status')
         self.filename = my_data.get('filename')
         self.finish_time = my_data.get('finish time')
-        # self.explanation = my_data['explanation']
 
     def is_done(self) -> bool:
         """
