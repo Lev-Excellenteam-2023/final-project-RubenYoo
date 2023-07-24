@@ -22,7 +22,6 @@ async def main():
         uploads = session.query(Upload).filter_by(status=UploadStatus.PENDING).all()
 
         for upload in uploads:
-            # update upload status to processing
             upload.status = UploadStatus.PROCESSING
             session.commit()
             uid = upload.uid

@@ -18,20 +18,14 @@ def upload_file():
     :return: a json with the uid of the file
     """
 
-    # Access the uploaded file
     file = request.files['file']
     timestamp = time.time()
 
     secret_string = file.filename + str(timestamp)
     namespace = uuid.uuid4()
-
-    # Generate a random UUID as the namespace
     uid = uuid.uuid5(namespace, secret_string)
 
-    # Access optional email parameter
     email = request.form.get('email')
-
-    # Create an Upload object and commit it to the database
 
     engine = create_engine(f'sqlite:///../Database/db/mydatabase.db', echo=True)
     Session = sessionmaker(bind=engine)
@@ -54,7 +48,6 @@ def upload_file():
     session.commit()
     session.close()
 
-    # Save the file
     file.save(f'uploads/{uid}.pptx')
 
     return {'uid': str(uid)}
@@ -67,7 +60,6 @@ def get_status():
     :return: a json with the status of the file
     """
 
-    # Fetch the upload from the DB
     engine = create_engine(f'sqlite:///../Database/db/mydatabase.db', echo=True)
     Session = sessionmaker(bind=engine)
     session = Session()
